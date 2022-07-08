@@ -1,0 +1,375 @@
+/WELCOME TO INIT.DAC, the input file for the DAC code
+/
+/ Some general comments: 
+/ commented lines can be begun with "/", "!", or " "(white space)
+/ (so that C and F style comments valid),
+/ use space for beauty instead of empty lines (? although it seem to work, better not ...)
+/ any number of consecutive comments allowed
+/ do not put any comments on same line after variables
+/
+/ exponential notations are allowed, e.g. 3.1d-5, 3e6
+/
+/ logical values as integers: "0" = .FALSE.  !="0" = .TRUE. (anything else)
+/
+/ Note that as of 6.2.12 no integrity checking is included - get it right!
+ 
+ 
+ 
+ 
+ 
+/GEOMETRY CONTROL-------------------------------------------------------------
+ 
+/nx,ny  - initial grid spacing
+/nx:
+100
+
+/ny:
+100
+
+/xl,yl - spatial extent of domain [m]
+100000.d0
+
+/yl
+100000.d0
+
+/zl - maximum height of initial landscape [m]
+1.d0
+
+/nnmax - maximum number of neighbours
+20
+ 
+ 
+/BOUNDARY TYPES-------------------------------------------------------------
+/ 0- no motion, constant elevation=0; 1 - no motion, constant elevation = initial elevation; 2 - implicit uplift, set as average of neighbours,  4 - normal uplift,  8 - motion in x, 16 - motion in y
+/ combine as follows by addition: no uplift and x-motion 8 or 9,  uplift and x-motion=12, uplift and y-motion=20, motion in all 3 directions = 28
+/ negative values: boundary is reflective, e.g. : -18 boundary elevation as inner neighbour average, motion in y, no river connections over boundary
+/left boundary
+0
+/right boundary
+1
+/front boundary
+-2
+/back boundary
+-2
+
+ 
+/PARAMETER CONTROL-------------------------------------------------------------
+ 
+ 
+/time -----
+/deltat [a] - time step length, [yr]
+2.0d3
+ 
+/time  [a] - time at start (should always be 0), [yr]
+0.d0  
+ 
+/tfinal [a] - final time [yr]
+/8.0d7
+140.d6
+ 
+/freq  -  frequency, plot and save vtk files every "freq"-th timestep 
+100
+ 
+/istep - time step counter (should always be set to 0)
+0
+ 
+/Stream power, Hack's law -----
+/n  -  slope exponent in fluvial incision law	Integer as declared in "parm" type
+1
+ 
+/m  -  area (or discharge) exponent in fluvial incision law
+0.4d0
+ 
+/h  -  Hack's exponent
+1.6666667d0
+
+/ka  -  Hack's constant (no unit)
+6.7d0 
+ 
+ 
+/Hill slope, analytical portion parameters -----
+/xc  -  hillslope length (in the vicinity of divides), [m]  CRUCIAL normally 1600
+295.146d0
+
+/tanthetac  -  tangent of hillslope slope
+0.3839
+
+/rainfall_available  -  first orographic parameter (not fully implemented), [m/yr]
+1.d0
+
+/rainfall_minimum  -  second orographic parameter (not fully implemented), [m/yr]
+1.d0
+
+/rainfall_height   -  this is used for constant rainfall parameter, [m/yr]
+1.d0
+
+/diffusivity  -  diffusivity for hilltops
+.14d0
+
+/min_erosion_rate  -  minimum allowable erosion rate for diffusion channel head  .1d-4, [m/yr]
+.1d-4
+
+/min_tan_head_slope  -  minimum slope of channel head (used as a threshold to diffusion)
+1.125d-2
+
+/lmax - maximum distance between two points before adding a node, [m]  CRUCIAL > grid spacing
+1.2d3
+
+/amin  -  minimum catchment head area before node removed, [m]
+2.0d5
+
+/ldivmax  -  maximum divide length for adding nodes, [m]
+2.5d3
+
+
+/uplift and advection parameters -----
+/uplift_scalar1  -  uplift rate as constant in interior, [m/yr]. This is used to pre-check the channel head slope at SS state, and if block setting is not used, this is used as internal uplift rate
+1.0d-6
+
+/uplift_scalar2 -  uplift rate on boundary (used only for channel head calc), [m/yr]
+1.0d-6
+
+/max_adv  -  max advection velocity, [m/yr]
+1.0d-6
+
+/k_scalar1   -  erodibility constant, [m/yr]
+5.d-6
+ 
+ 
+ 
+ 
+/USER / PROGRAM FLOW CONTROL---------------------------------------------------
+ 
+/FLAGS - 0=.FALSE.  1=.TRUE. 
+/plot_triangles   	- flag to plot triangles
+0
+ 
+/plot_receiver     	- flag to plot node to receiver connections
+1
+ 
+/plot_donors        	- flag to plot node to donors connections
+0
+ 
+/plot_no_receiver   	- flag to plot nodes with no receiver
+1
+ 
+/plot_no_donors  	- flag to plot nodes with no donor
+0
+ 
+/write_discharge     	- flag to write discharge
+0
+ 
+/write_stack_order   	- flag to write stack order
+0
+ 
+/plot_catchment   	- flag to plot catchments
+0
+ 
+/plot_height           	- flag to plot height contours
+1
+ 
+/plot_precipitation   	- flag to plot precipitation contours
+0 
+ 
+ 
+ 
+/move_points.     	- flag to allow the horizontal motion of nodes
+0
+ 
+/capture		        - flag to allow for captures
+1
+ 
+/divide               	- flag to allow for divide calculations
+1
+ 
+/small_divide 		- flag to allow for small divide calculations (case where divide is very close to zj)
+1
+ 
+/diffusion 		- flag to allow diffusive hilltops
+1
+ 
+/transient_divide 	- flag to calculate transient elevation of fluvial part of divides 
+1
+ 
+/non-flag
+/num_bins  - number of bins to store erosion history data
+12
+ 
+/sample_per_bin   - the number of timesteps (previous erosion values) per bin
+100
+ 
+/add_nodes   		- flag to allow adding nodes
+1
+ 
+/read_restart 		- flag to read GeoFile to restart run from the end of previous run
+0
+
+/num_restart        - if restart, this is which GeoFile to read, AND this file will be rewrite, if not restart, this is the starting number for naming GeoFiles
+0
+ 
+/ascii              - flag to output ASCII data of the run (used for post-processing)
+0
+ 
+/vtk_fine           - whether to output the full triangulation involving the divides. Large output files.
+0
+
+
+/------------------------------------------------------------------------------
+/ the routine of setting regolith layer and flexure regime, @YWANG
+/------------------------------------------------------------------------------
+/regolith_regime                 -flag of whether regolith regime is used
+0
+
+/ flexure_regime                  -flag of whether flexure regime is used
+0
+
+/regolith_time                   - the start time of regolith regime, in years
+90.d6
+
+/flexure_time                    - the start time of flexure regime, in years
+10000.d6
+
+/k_ratio                         - the ratio of erodibiliry of hard bedrock (K_scaler1) to soft regolith
+4.d1
+
+/regolith_thickness              - the finite thickness of the regolith layer before erosion, in meters
+5.d1
+
+/flexure_te                      - the effective elastic thickness of the lithosphere, in meters
+100.d3
+
+/------------------------------------------------------------------------------
+
+
+
+
+ 
+/------------------------------------------------------------------------------
+/ SPECIAL PROVISIONS - vary one input parameter as function of either x,y,z
+/ see bottom for syntax
+
+/f_varies_with_xyz        -  1 yes, 0 no: stop reading here
+1
+
+/f_num_sets             - how many times something is set as function of ... arbitrary combinations possible
+1
+
+
+// reset uplift field for time bounds not covered in Block 1
+//---------------- block 1
+/f_depends_on  - choice:  x,y,z
+x
+/f_variable_determined  - choice:  u,v,w, p,k
+w
+/superposition  0 - overwrite, 1 - add, 2 - multiply
+0
+/time bounds [a], if any -  write 0, 0 for eternity; e.g. 0, 1.d6 makes condition only valid for first 1 Ma
+0e6, 80e6
+/number of segments to follow - not determined automatically
+2
+/polynomial lines, matching number above
+0, 20000,0,  1e-3
+20000, 150000, 20000, 5e-6
+//---------------- block 1
+
+
+
+// reset uplift field for time bounds not covered in Block 1
+//---------------- block 1
+/f_depends_on  - choice:  x,y,z
+x
+/f_variable_determined  - choice:  u,v,w, p,k
+w
+/superposition  0 - overwrite, 1 - add, 2 - multiply
+0
+/time bounds [a], if any -  write 0, 0 for eternity; e.g. 0, 1.d6 makes condition only valid for first 1 Ma
+80e6, 140e6
+/number of segments to follow - not determined automatically
+1
+/polynomial lines, matching number above
+0, 100000,0,  5e-6
+//---------------- block 1
+
+
+
+//---------------- block 2
+/f_depends_on  - choice:  x,y,z
+x
+/f_variable_determined  - choice:  u,v,w, p,k
+z
+/superposition  0 - overwrite, 1 - add, 2 - multiply
+1
+/time bounds [a], if any -  write 0, 0 for eternity; e.g. 0, 1.d6 makes condition only valid for first ./1 Ma
+80e6, 80.000001e6
+/number of segments to follow - not determined automatically
+3
+/polynomial lines, matching number above
+0,5000,0,     0, 0.04d0
+5000, 7000, 5000,    200, 0.4
+7000, 100000,7000,    1000, -0.00001
+//---------------- block 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//SYNTAX EXPLANATION
+//repetitive segment block for each set, with
+/segment-wise polynomial definition:
+/ f(z) = c0 + c1*(z-z_offset) + c2*(z-z_offset)^2 + c3*(z-z_offset)^3 + ... + cn*(z-z_offset)^n  || [start z; end z]
+/ n: maximum polynomial degree is 50
+/start z, end z, z_offset, c0, c1,
+/valid input examples with comma separattion (minus the initial slash):
+/0, 10000, 0,  1e-6,  -1e-10
+/ means
+/ at virtually every altitude, decrease f from 1e-6 at 0 by 1e-10 per meter up
+/0, 1000, 0,  1e-6
+/1000, 3000, 1000, 1e-6, -2e-10
+/3000, 4000, 3000, 6e-7, -1e-10, -1e-13
+/4000, 10000, 4000, 4e-7
+/ means
+/ up to 1000,       f constant at k=1e-6
+/ from 1000-3000 m, f = 1e-6 -2e-10*(z-1000)
+/ from 3000-4000 m, f = 6e-7 -1e-10*(z-3000) -1e-13*(z-3000)^2
+/ above 4000 m,     f constant at k=4e-7
+/ note that connecting the f-values at segments (6e-7, 4e-7) is user responsibility
+
+/other note: if segments overlap in elevation, the one that is declared first takes precedence for its entire range
