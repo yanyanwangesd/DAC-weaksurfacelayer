@@ -13,9 +13,11 @@ subroutine VTK (geometry,delaunay,params,network,stack)
   character cs*8
   double precision vex,v1,v2
   double precision max_erosion_rate,  min_precipitation
+  double precision deltal
+  double precision, allocatable::slope(:)
   
   integer, allocatable::  morphzone(:)
-  allocate(morphzone(geometry%nnode))
+  allocate(morphzone(geometry%nnode), slope(geometry%nnode))
 
 !!$  max_erosion_rate = 0.0
 !!$  min_precipitation = params%rainfall_height
@@ -201,7 +203,20 @@ do i=1,geometry%nnode
     write(31,'(i1)') morphzone(i)    
 enddo
 
-deallocate(morphzone)
+write(31,'(a)')'SCALARS slope float 1'
+write (31,'(a)')'LOOKUP_TABLE default'
+do i=1,geometry%nnode
+    if(network%receiver(i)==0) then
+        slope(i)=0.d0
+    else
+        j = network%receiver(i)
+        deltal = sqrt((geometry%x(i)-geometry%x(j))**2+(geometry%y(i)-geometry%y(j))**2)
+        slope(i) = abs(geometry%z(i)-geometry%z(j))/deltal
+    endif
+    write(31,'(e12.4)') slope(i)    
+enddo
+
+deallocate(morphzone, slope)
 !!!!!!!! Y.W.
 
 
