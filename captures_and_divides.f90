@@ -149,8 +149,9 @@ subroutine captures_and_divides (geometry,network,params,delaunay,stack)
                 j=geometry%nn(k,i)
                 if(network%receiver(j).ne.i.and.network%receiver(i).ne.j ) then ! only for connections that are not part of the drainage network
                     fixprod= geometry%fix(i)*geometry%fix(j)
+                    if (geometry%z(i).lt.geometry%z(j) .and. geometry%fix(j).eq.0 .and. fixprod.ne.1) then
                     !check that i is lower than j, only capture 3 sides ,minus x=0
-                    if (geometry%z(i).lt.geometry%z(j)  .and. geometry%fix(i).ge.0  .and. geometry%fix(j).ge.0 .and. fixprod.ne.1 .and. geometry%y(i).gt.0.5d0 .and. geometry%y(j).gt.0.5d0 .and. geometry%y(i).lt.geometry%yl-0.5d0 .and. geometry%y(j).lt.geometry%yl-0.5d0 ) then
+                    !if (geometry%z(i).lt.geometry%z(j)  .and. geometry%fix(i).ge.0  .and. geometry%fix(j).ge.0 .and. fixprod.ne.1 .and. geometry%y(i).gt.0.5d0 .and. geometry%y(j).gt.0.5d0 .and. geometry%y(i).lt.geometry%yl-0.5d0 .and. geometry%y(j).lt.geometry%yl-0.5d0 ) then
     
                         l=dsqrt((geometry%x(i)-geometry%x(j))**2.d0+(geometry%y(i)-geometry%y(j))**2.d0) ! l is length betwenn i and j
     
@@ -694,7 +695,8 @@ subroutine captures_and_divides (geometry,network,params,delaunay,stack)
                 if(network%receiver(j).ne.i.and.network%receiver(i).ne.j) then ! only for connections that are not part of the drainage network
                 !if (geometry%z(i).lt.geometry%z(j)  .and. geometry%fix(j).eq.0  ) then ! check that i is lower than j
                     fixprod= geometry%fix(i)*geometry%fix(j)
-                    if (geometry%z(i).lt.geometry%z(j)  .and. geometry%fix(j).eq.0  .and. fixprod.ne.1 .and. geometry%y(i).gt.0.5d0 .and. geometry%y(j).gt.0.5d0 .and. geometry%y(i).lt.geometry%yl-0.5d0 .and. geometry%y(j).lt.geometry%yl-0.5d0 ) then! check that i is lower thanis lower than j, only capture 3 sides ,minus x=0
+                    if (geometry%z(i).lt.geometry%z(j) .and. geometry%fix(j).eq.0 .and. fixprod.ne.1) then
+                    !if (geometry%z(i).lt.geometry%z(j)  .and. geometry%fix(j).eq.0  .and. fixprod.ne.1 .and. geometry%y(i).gt.0.5d0 .and. geometry%y(j).gt.0.5d0 .and. geometry%y(i).lt.geometry%yl-0.5d0 .and. geometry%y(j).lt.geometry%yl-0.5d0 ) then! check that i is lower thanis lower than j, only capture 3 sides ,minus x=0
 
                         l=dsqrt((geometry%x(i)-geometry%x(j))**2.d0+(geometry%y(i)-geometry%y(j))**2.d0) ! l is length betwenn i and j
                         if(l.gt.params%xc) then
