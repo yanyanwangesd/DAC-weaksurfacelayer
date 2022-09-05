@@ -216,7 +216,7 @@ do i = 1, delaunay%ntriangles
 				rix(j) = 1
 			endif
 			! store which ones are boundaries
-			if(geometry%fix(tix(j)) .eq. 1) fix(j) = 1
+			if(geometry%fix(tix(j)) .ne. 0) fix(j) = 1
 		end do
 		
 		! calculate triangles depending on configuration
