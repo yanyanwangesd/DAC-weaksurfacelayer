@@ -649,6 +649,7 @@ subroutine captures_and_divides (geometry,network,params,delaunay,stack)
     
     !****************** STEP 5) connect between divides and triangles  **********************************
     ! Here all the divides are found - connect between divides and triangles 	5.3.12
+    delaunay%numdivides=0 ! this line is to necessary when add_remove_nodes is switch off, Sept. 2022
     do div=1,ndivide
         i= geometry%nndivnode(div,1)
         j= geometry%nndivnode(div,2)
@@ -1193,6 +1194,7 @@ subroutine captures_and_divides (geometry,network,params,delaunay,stack)
 
     !****************** STEP 5)  connect between divides and triangles  **********************************
     ! Here all the divides are found - connect between divides and triangles 		5.3.12
+    delaunay%numdivides=0 ! this line is to necessary when add_remove_nodes is switch off, Sept. 2022
     do div=1,ndivide
         i= geometry%nndivnode(div,1)
         j= geometry%nndivnode(div,2)
