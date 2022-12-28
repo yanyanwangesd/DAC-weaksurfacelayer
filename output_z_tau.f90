@@ -76,7 +76,7 @@ subroutine output_z_tau (params,geometry,network,stack)
   enddo
   open (75,file='ASCII/tau_z'//cs,status='unknown')
   do i=1,geometry%nnode
-     write(75,'(f8.3,f15.3,f15.4,f15.3,i5,f15.3)') geometry%z(i), tau(i),  chi(i), geometry%chi(i), geometry%catchment(i), contributing_area(i)
+     write(75,'(f8.3,f15.3,f15.4,f15.3,i5,f20.3)') geometry%z(i), tau(i),  chi(i), geometry%chi(i), geometry%catchment(i), contributing_area(i)
   enddo
   close (75)
 
