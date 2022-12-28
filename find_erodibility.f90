@@ -37,7 +37,24 @@ if (params%time >= params%regolith_time ) then
     do i=1,geometry%nnode
         cindex = geometry%catchment(i)
         
-        ! boundary basins
+        !! side boundary basins, for plateau rivers that also flow to the side basins
+        !if(geometry%fix(cindex)==3 .or. geometry%fix(cindex)==4) then ! initialize regolith layer
+        !     if(params%time .eq. Tstart)then
+        !       geometry%k(i) = k_ratio*params%k_scalar1
+        !        geometry%dregolith(i) = regolith_thickness
+        !    else
+        !        if(geometry%dregolith(i).gt.0.d0)then
+        !           geometry%k(i) = k_ratio*params%k_scalar1
+        !            geometry%dregolith(i) = geometry%dregolith(i)-geometry%erosion_rate(i)*params%deltat
+        !            geometry%precipitation(i) = params%rainfall_height/(k_ratio**(1/params%m)) !scale rainfall to keep erosion rate unchanged
+        !        else
+        !            geometry%k(i) = params%k_scalar1
+        !            geometry%dregolith(i) = -1.d0
+        !        endif
+        !    endif
+        ! endif
+        
+        ! side boundary basins, for plateau basins that only flow to the right boundary
         if(geometry%fix(cindex)==3 .or. geometry%fix(cindex)==4) then
             geometry%k(i) = params%k_scalar1
             geometry%dregolith(i) = 0.d0
