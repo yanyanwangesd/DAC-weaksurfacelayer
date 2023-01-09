@@ -9,8 +9,12 @@ LIBS = -lm -lgfortran -LNN -lnn
 #INCLUDE =
 #OPTIONS =  -O0 -g -ggdb
 ##
-#build version release
+#build version release, if compile error about '-mcmodel=medium', please 
+#replace 'medium' in the following 4 lines with 'small'
 FLAGS =  -c -fbounds-check -O2  -ffree-line-length-400 -mcmodel=medium
 CFLAGS = -c -O2  -mcmodel=medium
 INCLUDE =
 OPTIONS =  -O2 -mcmodel=medium
+
+
+
